@@ -1,29 +1,26 @@
+require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose'); // Import Mongoose
+const connectDB = require('./config/db');
+const userRoutes = require('./routes/userRoutes');
+
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(express.json()); // To parse JSON bodies
+// Connect to MongoDB
+connectDB();
 
-// Connect to MongoDB with direct password
-const dbPassword = 'strongphp'; // Your MongoDB password
-const uri = `mongodb+srv://fullstack:${dbPassword}@fullstack.ysh1o.mongodb.net/?retryWrites=true&w=majority&appName=fullstack`;
+// Middleware to parse JSON
+app.use(express.json());
 
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Routes
+app.use('/api/users', userRoutes); // Mount user routes
 
-// Simple route to test if server is running
+// Simple route
 app.get('/', (req, res) => {
   res.send('Server is running');
 });
 
-app.get('/test', (req, res) => {
-  res.send("kabeeri is running");
-});
-
-// Starting the server
+// Start server
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
