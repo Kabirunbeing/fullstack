@@ -1,7 +1,6 @@
-// controllers/commentController.js
 const Comment = require('../models/commentModel');
 
-// Controller to create a comment
+// Create a comment
 exports.createComment = async (req, res) => {
   const { commentText, author, postId } = req.body;
 
@@ -19,7 +18,7 @@ exports.createComment = async (req, res) => {
   }
 };
 
-// Controller to fetch comments by post ID
+// Fetch comments by post ID
 exports.getCommentsByPostId = async (req, res) => {
   const { postId } = req.params;
 
@@ -32,7 +31,7 @@ exports.getCommentsByPostId = async (req, res) => {
   }
 };
 
-// Controller to delete a comment
+// Delete a comment
 exports.deleteComment = async (req, res) => {
   const { commentId } = req.params;
 

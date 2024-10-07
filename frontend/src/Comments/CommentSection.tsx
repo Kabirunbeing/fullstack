@@ -2,79 +2,95 @@ import React, { useEffect, useState } from 'react';
 
 interface Comment {
   _id: string;
-  content: string;
+  commentText: string;
   author: string;
+  postId: string;
+  createdAt: string;
 }
 
 const CommentSection: React.FC = () => {
+  const postId = 'YOUR_POST_ID_HERE'; // Hardcode the postId or retrieve it in another way
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState<string>('');
+  const [commentText, setCommentText] = useState('');
+  const [author, setAuthor] = useState('');
 
-  // Fetch comments from the API
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/comments');
-        if (!response.ok) {
-          throw new Error('Failed to fetch comments');
-        }
-        const data = await response.json();
-        setComments(data);
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      }
-    };
+  // Fetch comments for the specified post
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`/api/posts/${postId}/comments`);
+      const data = await response.json();
+      setComments(data);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
 
-    fetchComments();
-  }, []);
+  // Handle comment submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  // Handle adding a new comment
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return; // Prevent empty comments
+    if (!commentText || !author) {
+      alert('Please provide both author and comment text.');
+      return;
+    }
 
     try {
-      const response = await fetch('http://localhost:5000/api/comments', {
+      const response = await fetch('/api/comments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: newComment, author: 'Anonymous' }), // Change 'Anonymous' to actual author if needed
+        body: JSON.stringify({
+          commentText,
+          author,
+          postId,
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to add comment');
+      if (response.ok) {
+        const newComment = await response.json();
+        setComments((prevComments) => [...prevComments, newComment]);
+        setCommentText('');
+        setAuthor('');
+      } else {
+        console.error('Error adding comment:', response.statusText);
       }
-
-      const addedComment = await response.json();
-      setComments((prevComments) => [...prevComments, addedComment]);
-      setNewComment(''); // Clear the input after submission
     } catch (error) {
-      console.error('Error adding comment:', error);
+      console.error('Error submitting comment:', error);
     }
   };
 
+  // Fetch comments on component mount
+  useEffect(() => {
+    fetchComments();
+  }, []);
+
   return (
-    <div className="comment-section mt-4">
-      <h3 className="text-xl font-semibold mb-2">Comments</h3>
-      <ul className="space-y-2">
+    <div>
+      <h3>Comments</h3>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          placeholder="Your name"
+          required
+        />
+        <textarea
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          placeholder="Your comment"
+          required
+        />
+        <button type="submit">Submit Comment</button>
+      </form>
+      <ul>
         {comments.map((comment) => (
-          <li key={comment._id} className="p-2 border border-gray-300 rounded-md">
-            <strong>{comment.author}</strong>: {comment.content}
+          <li key={comment._id}>
+            <strong>{comment.author}</strong>: {comment.commentText}
           </li>
         ))}
       </ul>
-      <div className="mt-4">
-        <input
-          type="text"
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment"
-          className="border border-gray-300 rounded-md p-2"
-        />
-        <button onClick={handleAddComment} className="ml-2 bg-blue-500 text-white rounded-md p-2">
-          Submit
-        </button>
-      </div>
     </div>
   );
 };

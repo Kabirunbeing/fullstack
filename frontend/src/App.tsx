@@ -12,8 +12,8 @@ import SearchBar from "./components/SearchBar";
 import SinglePost from "./Posts/SinglePost";
 import TagList from "./components/Taglist";
 import UserBadge from "./components/UserBadge";
-import UserProfile from "./components/UserProfile";
-import CommentSection from "./Comments/CommentSection";
+import UserProfile from "./Users/UserProfile";
+// import CommentSection from "./Comments/CommentSection";
 
 function App() {
   return (
@@ -22,8 +22,9 @@ function App() {
         <Header />
         <SearchBar />
         <NewPost/>
-        <CommentSection/>
+        {/* <CommentSection/> */}
           <PostList/>
+          <UserProfile/>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/posts/new" element={<NewPost />} />
