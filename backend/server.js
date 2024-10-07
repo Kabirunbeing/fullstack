@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const postRoutes = require('./routes/postRoutes');
+const commentRoutes = require('./routes/commentRoutes'); // Import comment routes
 
 // Load environment variables
 dotenv.config();
@@ -15,8 +16,9 @@ connectDB();
 // Middleware to parse JSON
 app.use(express.json());
 
-// Use the post routes
+// Use the post and comment routes
 app.use('/api', postRoutes);
+app.use('/api', commentRoutes); // Add the comment routes
 
 // Define a test route
 app.get('/', (req, res) => {
